@@ -87,6 +87,66 @@
                         </div>
                     </div>
                 </div>
+                <div class="card my-4 pt-5">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                        <div class="bg-gradient-secondary shadow-primary border-radius-lg pt-4 pb-3">
+                            <h6 class="text-white text-capitalize ps-3"> Match Scores</h6>
+                        </div>
+                    </div>
+                    <div class="card-body px-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Home Team
+                                    </th>
+                                    <th>
+                                        &#8203;
+                                    </th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Away Team
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <p class="align-middle text-center" id="home_team_1">-</p>
+                                    </td>
+                                    <td>
+                                        <p class="align-middle text-center">
+                                            -
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p class="align-middle text-center" id="away_team_1">
+                                            -
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="align-middle text-center" id="home_team_2">
+                                            -
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p class="align-middle text-center">
+                                            -
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p class="align-middle text-center" id="away_team_2">
+                                            -
+                                        </p>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-2">
                 <div class="card my-4">
@@ -123,7 +183,7 @@
         <div class="col-12 ">
             <button onclick="$.playAll()" class="btn btn-success" id="playAll">Play All Weeks</button>
             <button onclick="$.playNext()" class="btn btn-behance" id="playNext">Play Next Week</button>
-            <button onclick="$.delete()" class="btn btn-danger">Reset Data</button>
+            <button onclick="$.delete()" class="btn btn-danger" id="resetBtn">Reset Data</button>
         </div>
     </div>
 
@@ -219,16 +279,23 @@
                 ]
             });
 
+            var intervalId;
             $.playAll = function () {
                 $('#playNext').prop('disabled', true)
                 $('#playAll').prop('disabled', true)
-                let i = 0;
-                setInterval(function () {
-                    while (i < fixtureEnds) {
+                $('#resetBtn').prop('disabled', true)
+
+                intervalId = setInterval(function () {
+                    if (currentWeek < fixtureEnds) {
                         $.playNext()
-                        i++;
+                    } else {
+                        $.playNext()
+                        clearInterval(intervalId);
+                        intervalId = null;
+                        $('#resetBtn').prop('disabled', false)
                     }
-                }, 1000);
+                }, 1500);
+
             }
 
             $.playNext = function () {
@@ -239,10 +306,15 @@
                         week: currentWeek
                     },
                     success: function (res) {
-                        if (res && (currentWeek < fixtureEnds)) {
-                            currentWeek += 1;
+                        if ((res.length !== 0) && (currentWeek < fixtureEnds)) {
+                            currentWeek += 1
                             $('#week').text("Week " + currentWeek);
-                            $('#week').attr('data-week', currentWeek);
+                            $('#home_team_1').text(res[0].home_team + " (" + res[0].home_team_goal + ")");
+                            $('#away_team_1').text(res[0].away_team + " (" + res[0].away_team_goal + ")");
+
+                            $('#home_team_2').text(res[1].home_team + " (" + res[1].home_team_goal + ")");
+                            $('#away_team_2').text(res[1].away_team + " (" + res[1].away_team_goal + ")");
+
                         } else {
                             $.dialog({
                                 title: 'Info!',

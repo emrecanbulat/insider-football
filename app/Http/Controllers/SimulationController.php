@@ -50,13 +50,14 @@ class SimulationController extends Controller
 
     /**
      * @param Request $request
-     * @return bool
+     * @return array
      */
-    public function simulate(Request $request): bool
+    public function simulate(Request $request): array
     {
+        $results = array();
         $fixture = Fixture::select('home_team_id', 'away_team_id')->where("week", $request->week)->where("is_played", false)->get();
-        if (is_null($fixture) || $fixture->count() == 0) {
-            return false;
+        if(is_null($fixture) || $fixture->count() == 0) {
+            return $results;
         } else {
             $teams = Team::all();
             foreach ($fixture as $f) {
@@ -106,10 +107,16 @@ class SimulationController extends Controller
                     "goal_dif" => ($awayTeam->goal_for + $awayTeamGoal) - ($awayTeam->goal_against + $homeTeamGoal),
                     "played" => $awayTeam->played + 1,
                 ]);
+                $results[] = [
+                    "home_team" => $homeTeam->name,
+                    "home_team_goal" => $homeTeamGoal,
+                    "away_team" => $awayTeam->name,
+                    "away_team_goal" => $awayTeamGoal,
+                ];
 
             }
             Fixture::where("week", $request->week)->update(["is_played" => true]);
-            return true;
+            return $results;
         }
     }
 
@@ -131,13 +138,13 @@ class SimulationController extends Controller
         foreach ($fixtures as $fixture) {
 //            $awayTeam = Team::where("id", $fixture->away_team_id)->first();
             if ($fixture->home_team_id == $team->id) {
-//                $chance += 2;
+                $chance += 2;
 //                $chance += $team->strength / ($team->strength + $awayTeam->strength);;
-                $chance += $team->points;
+//                $chance += $team->points;
             }
-//            $chance += 1;
+            $chance += 1;
 //            $chance += $awayTeam->strength / ($awayTeam->strength + $team->strength);;
-            $chance += $this->remainedPoints - $team->points;
+//            $chance += $this->remainedPoints - $team->points;
         }
 
         // 2* 80 - ((10-6) / 2)
