@@ -4,7 +4,7 @@
 
     <div class="container-fluid py-4">
         <div class="row content-center">
-            <div class="col-6">
+            <div class="col-7">
                 <div class="card my-4">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                         <div class="bg-gradient-secondary shadow-primary border-radius-lg pt-4 pb-3">
@@ -13,7 +13,7 @@
                     </div>
                     <div class="card-body px-0 pb-2">
                         <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0">
+                            <table class="table align-items-center mb-0" id="standings" style="width: 100%">
                                 <thead>
                                 <tr>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -38,41 +38,18 @@
                                         Lost
                                     </th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Goal For
+                                    </th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Goal Against
+                                    </th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Goal Diff
                                     </th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($teams as $team)
-                                    <tr>
-                                        <td class="align-middle text-center text-sm">
-                                            <div class="d-flex px-3 py-1">
-                                                <img src="{{$team->logo}}" class="avatar avatar-xs me-3 border-radius-lg" alt="user1">
-                                            </div>
-                                        </td>
-                                        <td >
-                                            <p class="text-xs font-weight-bold mb-0">{{$team->name}}</p>
-                                        </td>
-                                        <td class="align-middle text-center text-sm">
-                                            <p class="text-xs font-weight-bold mb-0">{{$team->points}}</p>
-                                        </td>
-                                        <td class="align-middle text-center text-sm">
-                                            <p class="text-xs font-weight-bold mb-0">{{$team->played}}</p>
-                                        </td>
-                                        <td class="align-middle text-center text-sm">
-                                            <p class="text-xs font-weight-bold mb-0">{{$team->win}}</p>
-                                        </td>
-                                        <td class="align-middle text-center text-sm">
-                                            <p class="text-xs font-weight-bold mb-0">{{$team->drawn}}</p>
-                                        </td>
-                                        <td class="align-middle text-center text-sm">
-                                            <p class="text-xs font-weight-bold mb-0">{{$team->lost}}</p>
-                                        </td>
-                                        <td class="align-middle text-center text-sm">
-                                            <p class="text-xs font-weight-bold mb-0">{{$team->goal_dif}}</p>
-                                        </td>
-                                    </tr>
-                                @endforeach
+
                                 </tbody>
                             </table>
                         </div>
@@ -83,12 +60,13 @@
                 <div class="card my-4">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                         <div class="bg-gradient-secondary shadow-primary border-radius-lg pt-4 pb-3">
-                            <h6 class="text-white text-capitalize ps-3">Week 1</h6>
+                            <h6 class="text-white text-capitalize ps-3" id="week" data-week="1">
+                                Week {{$currentWeek}}</h6>
                         </div>
                     </div>
                     <div class="card-body px-0 pb-2">
                         <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0">
+                            <table class="table align-items-center mb-0" id="fixture" style="width: 100%">
                                 <thead>
                                 <tr>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -103,32 +81,14 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($fixture as $fix)
-                                    <tr>
-                                        <td>
-                                            <p class="align-middle text-center text-xs font-weight-bold mb-0">
-                                                {{$teams->where("id",$fix->home_team_id)->first()->name}}
-                                            </p>
-                                        </td>
-                                        <td>
-                                            <p class="align-middle text-center">
-                                                -
-                                            </p>
-                                        </td>
-                                        <td>
-                                            <p class="align-middle text-center text-xs font-weight-bold mb-0">
-                                                {{$teams->where("id",$fix->away_team_id)->first()->name}}
-                                            </p>
-                                        </td>
-                                    </tr>
-                                @endforeach
+
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-3">
+            <div class="col-2">
                 <div class="card my-4">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                         <div class="bg-gradient-secondary shadow-primary border-radius-lg pt-4 pb-3">
@@ -137,7 +97,7 @@
                     </div>
                     <div class="card-body px-0 pb-2">
                         <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0">
+                            <table class="table align-items-center mb-0" id="prodictions" style="width: 100%">
                                 <thead>
                                 <tr>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -146,31 +106,13 @@
                                     <th>
                                         &#8203;
                                     </th>
-                                    <th class="text-center text-uppercase text-secondary text-xxl font-weight-bolder opacity-7 ps-2">
-                                        %
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        %(Chance)
                                     </th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($teams as $team)
-                                    <tr>
-                                        <td>
-                                            <p class="align-middle text-center text-xs font-weight-bold mb-0">
-                                                {{$team->name}}
-                                            </p>
-                                        </td>
-                                        <td>
-                                            <p class="align-middle text-center">
-                                                -
-                                            </p>
-                                        </td>
-                                        <td>
-                                            <p class="align-middle text-center text-xs font-weight-bold mb-0">
-                                               0
-                                            </p>
-                                        </td>
-                                    </tr>
-                                @endforeach
+
                                 </tbody>
                             </table>
                         </div>
@@ -179,12 +121,11 @@
             </div>
         </div>
         <div class="col-12 ">
-            <a class="btn btn-success">Play All Weeks</a>
-            <a class="btn btn-behance">Play Next Week</a>
-            <a onclick="$.delete()"  class="btn btn-danger">Reset Data</a>
+            <button onclick="$.playAll()" class="btn btn-success" id="playAll">Play All Weeks</button>
+            <button onclick="$.playNext()" class="btn btn-behance" id="playNext">Play Next Week</button>
+            <button onclick="$.delete()" class="btn btn-danger">Reset Data</button>
         </div>
     </div>
-
 
 @endsection
 
@@ -192,6 +133,131 @@
 
     <script>
         $(document).ready(function () {
+            let currentWeek = {{$currentWeek}};
+            let fixtureEnds = {{$fixtureEnds}};
+
+            if (currentWeek === fixtureEnds) {
+                $('#playAll').hide();
+                $('#playNext').hide();
+            }
+
+            $('#standings').DataTable({
+                "searching": false,
+                "lengthChange": false,
+                "ordering": false,
+                "paging": false,
+                "processing": true,
+                "serverSide": true,
+                "info": false,
+                "ajax": {
+                    url: "{{route('get-teams')}}",
+                    type: 'GET'
+                },
+                'columns': [
+                    {
+                        data: null, className: 'text-center', render: function (data) {
+                            return '<div class="d-flex px-3 py-1">' +
+                                '<img src="' + data.logo + ' " class="avatar avatar-xs me-3 border-radius-lg" alt="user1">'
+                            '</div>'
+                        }
+                    },
+                    {data: 'name', className: 'text-center'},
+                    {data: 'points', className: 'text-center'},
+                    {data: 'played', className: 'text-center'},
+                    {data: 'win', className: 'text-center'},
+                    {data: 'drawn', className: 'text-center'},
+                    {data: 'lost', className: 'text-center'},
+                    {data: 'goal_for', className: 'text-center'},
+                    {data: 'goal_against', className: 'text-center'},
+                    {data: 'goal_dif', className: 'text-center'},
+                ]
+            });
+
+            $('#fixture').DataTable({
+                "searching": false,
+                "lengthChange": false,
+                "ordering": false,
+                "paging": false,
+                "processing": true,
+                "serverSide": true,
+                "info": false,
+                "ajax": {
+                    url: "{{route('get-fixture')}}",
+                    type: 'GET'
+                },
+                'columns': [
+                    {data: 'home_team.0.name', className: 'text-center'},
+                    {
+                        data: null, className: 'text-center', render: function (data) {
+                            return "-"
+                        }
+                    },
+                    {data: 'away_team.0.name', className: 'text-center'},
+                ]
+            });
+
+            $('#prodictions').DataTable({
+                "searching": false,
+                "lengthChange": false,
+                "ordering": false,
+                "paging": false,
+                "processing": true,
+                "serverSide": true,
+                "info": false,
+                "ajax": {
+                    url: "{{route('get-prodictions')}}",
+                    type: 'GET'
+                },
+                'columns': [
+                    {data: 'name', className: 'text-center'},
+                    {
+                        data: null, className: 'text-center', render: function (data) {
+                            return "-"
+                        }
+                    },
+                    {data: 'chance', className: 'text-center'},
+                ]
+            });
+
+            $.playAll = function () {
+                $('#playNext').prop('disabled', true)
+                $('#playAll').prop('disabled', true)
+                let i = 0;
+                setInterval(function () {
+                    while (i < fixtureEnds) {
+                        $.playNext()
+                        i++;
+                    }
+                }, 1000);
+            }
+
+            $.playNext = function () {
+                $.ajax({
+                    url: '{{route('play-match')}}',
+                    type: "GET",
+                    data: {
+                        week: currentWeek
+                    },
+                    success: function (res) {
+                        if (res && (currentWeek < fixtureEnds)) {
+                            currentWeek += 1;
+                            $('#week').text("Week " + currentWeek);
+                            $('#week').attr('data-week', currentWeek);
+                        } else {
+                            $.dialog({
+                                title: 'Info!',
+                                content: "fixture completed, no new match can be played",
+                            });
+                            $('#playNext').prop('disabled', true)
+                            $('#playAll').prop('disabled', true)
+                        }
+                        $('#standings').DataTable().ajax.reload();
+                        $('#fixture').DataTable().ajax.reload();
+                        $('#prodictions').DataTable().ajax.reload();
+                    }
+                })
+            }
+
             $.delete = function () {
                 $.confirm({
                     title: 'Reset Data',
@@ -228,8 +294,6 @@
                     },
                 });
             }
-
-
         });
 
     </script>

@@ -33,6 +33,7 @@
                                         <tr>
                                             <td>
                                                 <p class="align-middle text-center text-xs font-weight-bold mb-0">
+                                                    <img src="{{$teams->where("id",$fix[0])->first()->logo}}" class="avatar avatar-xs me-3 border-radius-lg" alt="user1">
                                                     {{$teams->where("id",$fix[0])->first()->name}}
                                                 </p>
                                             </td>
@@ -43,6 +44,7 @@
                                             </td>
                                             <td>
                                                 <p class="align-middle text-center text-xs font-weight-bold mb-0">
+                                                    <img src="{{$teams->where("id",$fix[1])->first()->logo}}" class="avatar avatar-xs me-3 border-radius-lg" alt="user1">
                                                     {{$teams->where("id",$fix[1])->first()->name}}
                                                 </p>
                                             </td>
@@ -58,7 +60,7 @@
         </div>
         <div class="col-3">
             <div class="block-header block-header-rtl">
-                <a href="{{route("fixture.create")}}" class="btn btn-success">Start Simulator</a>
+                <a href="{{route("simulation.index")}}" class="btn btn-success">Start Simulator</a>
             </div>
         </div>
     </div>

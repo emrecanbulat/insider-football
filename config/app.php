@@ -42,7 +42,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -157,12 +157,15 @@ return [
 
     'providers' => ServiceProvider::defaultProviders()->merge([
         /*
+         * Application Service Providers...
+        */
+
+        Yajra\DataTables\DataTablesServiceProvider::class,
+
+        /*
          * Package Service Providers...
          */
 
-        /*
-         * Application Service Providers...
-         */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,

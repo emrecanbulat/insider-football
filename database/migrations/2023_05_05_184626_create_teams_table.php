@@ -20,6 +20,8 @@ return new class extends Migration
             $table->smallInteger('win')->default(0);
             $table->smallInteger('drawn')->default(0);
             $table->smallInteger('lost')->default(0);
+            $table->smallInteger('goal_for')->default(0);
+            $table->smallInteger('goal_against')->default(0);
             $table->smallInteger('goal_dif')->default(0);
             $table->string('logo');
             $table->timestamps();

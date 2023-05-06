@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Fixture;
 use App\Models\Team;
+use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Yajra\DataTables\DataTables;
 
 class FixtureController extends Controller
 {
@@ -17,10 +19,11 @@ class FixtureController extends Controller
     public function index(): Application|View|Factory|\Illuminate\Contracts\Foundation\Application
     {
         $teams = Team::all();
-        $teamArray = Team::pluck("id")->shuffle()->toArray();
+        $teamArray = $teams->pluck("id")->shuffle()->toArray();
         $matchCount = 2 * (count($teamArray) - 1);
         $fixtures = array();
         Fixture::truncate();
+
         for ($i = 0; $i < $matchCount; $i++) {
             $matchList = array();
             for ($j = 0; $j < count($teamArray) / 2; $j++) {
@@ -32,7 +35,6 @@ class FixtureController extends Controller
                 } else {
                     $match = array($awayTeam, $homeTeam);
                 }
-
                 $matchList[] = $match;
             }
 
@@ -48,52 +50,13 @@ class FixtureController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|Factory|View|Application
+     * @return JsonResponse
+     * @throws Exception
      */
-    public function create()
+    public function getFixture(): JsonResponse
     {
-        $teams = Team::all();
-        $fixture = Fixture::where("week", 1)->get();
-        return view("simulator", compact("teams", "fixture"));
+        $fixtures = Fixture::where("week", Fixture::where("is_played", false)->min("week"))->with('homeTeam', 'awayTeam')->get();
+        return DataTables::of($fixtures)->toJson();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        return $request;
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

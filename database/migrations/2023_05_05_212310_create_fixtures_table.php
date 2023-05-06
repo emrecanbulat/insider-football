@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('home_team_id');
             $table->unsignedBigInteger('away_team_id');
             $table->smallInteger('week');
+            $table->boolean('is_played')->default(false);
 
             //FOREIGN KEY CONSTRAINTS
             $table->foreign('home_team_id')->references('id')->on('teams')->onDelete('cascade');
