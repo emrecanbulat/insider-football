@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Fixture;
 use App\Models\Team;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -19,17 +20,17 @@ class FixtureController extends Controller
         $teamArray = Team::pluck("id")->shuffle()->toArray();
         $matchCount = 2 * (count($teamArray) - 1);
         $fixtures = array();
-
+        Fixture::truncate();
         for ($i = 0; $i < $matchCount; $i++) {
             $matchList = array();
             for ($j = 0; $j < count($teamArray) / 2; $j++) {
-                $homeowner = $teamArray[$j];
-                $displacement = $teamArray[count($teamArray) - 1 - $j];
+                $homeTeam = $teamArray[$j];
+                $awayTeam = $teamArray[count($teamArray) - 1 - $j];
 
                 if ($i % 2 == 0) {
-                    $match = array($homeowner, $displacement);
+                    $match = array($homeTeam, $awayTeam);
                 } else {
-                    $match = array($displacement, $homeowner);
+                    $match = array($awayTeam, $homeTeam);
                 }
 
                 $matchList[] = $match;
@@ -39,16 +40,21 @@ class FixtureController extends Controller
             array_splice($teamArray, 1, 0, array_pop($teamArray));
 
             $fixtures[] = $matchList;
+            foreach ($matchList as $match) {
+                Fixture::create(["home_team_id" => $match[0], "away_team_id" => $match[1], "week" => $i + 1]);
+            }
         }
-        return view("fixture", compact("fixtures","teams"));
+        return view("fixture", compact("fixtures", "teams"));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @return \Illuminate\Contracts\Foundation\Application|Factory|View|Application
      */
     public function create()
     {
-        //
+        $teams = Team::all();
+        $fixture = Fixture::where("week", 1)->get();
+        return view("simulator", compact("teams", "fixture"));
     }
 
     /**
@@ -56,7 +62,7 @@ class FixtureController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return $request;
     }
 
     /**

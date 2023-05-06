@@ -14,6 +14,8 @@
     <!-- Nucleo Icons -->
     <link href="{{asset('assets/css/nucleo-icons.css')}}" rel="stylesheet" />
     <link href="{{asset('assets/css/nucleo-svg.css')}}" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
     <!-- Font Awesome Icons -->
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <!-- Material Icons -->
@@ -28,11 +30,12 @@
 
 
 <!-- link that opens popup -->
-<script src=" https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js" integrity="sha256-eTyxS0rkjpLEo16uXTS0uVCS4815lc40K2iVpWDvdSY=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
 <script src="{{asset('assets/js/core/popper.min.js')}}"></script>
 <script src="{{asset('assets/js/core/bootstrap.min.js')}}"></script>
-<script src="{{asset('assets/js/plugins/perfect-scrollbar.min.js"')}}"></script>
-<script src="{{asset('assets/js/plugins/smooth-scrollbar.min.js"')}}"></script>
+<script src="{{asset('assets/js/plugins/perfect-scrollbar.min.js')}}"></script>
+<script src="{{asset('assets/js/plugins/smooth-scrollbar.min.js')}}"></script>
 <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -45,8 +48,8 @@
 <!-- Github buttons -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-<script src="{{asset('assets/js/material-dashboard.min.js?v=3.0.0"')}}"></script>
-
+{{--<script src="{{asset('assets/js/material-dashboard.min.js?v=3.0.0')}}"></script>--}}
+@yield('js')
 </body>
 
 </html>

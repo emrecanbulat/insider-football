@@ -17,14 +17,14 @@
                                 <table class="table align-items-center mb-0">
                                     <thead>
                                     <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Homeowner
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Home Team
                                         </th>
                                         <th>
                                             &#8203;
                                         </th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Displacement
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Away Team
                                         </th>
                                     </tr>
                                     </thead>
@@ -32,17 +32,17 @@
                                     @foreach($fixture as $fix)
                                         <tr>
                                             <td>
-                                                <p class="text-xs font-weight-bold mb-0">
+                                                <p class="align-middle text-center text-xs font-weight-bold mb-0">
                                                     {{$teams->where("id",$fix[0])->first()->name}}
                                                 </p>
                                             </td>
                                             <td>
-                                                <p>
+                                                <p class="align-middle text-center">
                                                     -
                                                 </p>
                                             </td>
                                             <td>
-                                                <p class="text-xs font-weight-bold mb-0">
+                                                <p class="align-middle text-center text-xs font-weight-bold mb-0">
                                                     {{$teams->where("id",$fix[1])->first()->name}}
                                                 </p>
                                             </td>
@@ -55,6 +55,11 @@
                     </div>
                 </div>
             @endforeach
+        </div>
+        <div class="col-3">
+            <div class="block-header block-header-rtl">
+                <a href="{{route("fixture.create")}}" class="btn btn-success">Start Simulator</a>
+            </div>
         </div>
     </div>
 
