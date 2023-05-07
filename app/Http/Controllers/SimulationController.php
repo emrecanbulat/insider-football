@@ -179,7 +179,7 @@ class SimulationController extends Controller
             foreach ($fixtures as $fixture) {
                 $awayTeam = Team::where("id", $fixture->away_team_id)->first();
                 if ($fixture->home_team_id == $team->id) {
-                    $chance += $team->strength / ($team->strength + $awayTeam->strength);
+                    $chance += $team->strength * 2 / ($team->strength + $awayTeam->strength);
                 } else {
                     $chance += $awayTeam->strength / ($awayTeam->strength + $team->strength);;
                 }
