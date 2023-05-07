@@ -14,7 +14,7 @@ use Yajra\DataTables\DataTables;
 
 class SimulationController extends Controller
 {
-    const ITERATION_COUNT = 1000;
+    const ITERATION_COUNT = 1000; // iteration count for the monte carlo simulation
     const GOAL_PER_MIN_VAL = 0.05;
     const GOAL_PER_MAX_VAL = 0.1;
     const MATCH_LENGTH = 90; // Duration of the match (in minutes)
@@ -56,111 +56,74 @@ class SimulationController extends Controller
     {
         $results = array();
         $fixture = Fixture::select('home_team_id', 'away_team_id')->where("week", $request->week)->where("is_played", false)->get();
-        if(is_null($fixture) || $fixture->count() == 0) {
-            return $results;
-        } else {
-            $teams = Team::all();
+        if ($fixture->count() > 0) {
             foreach ($fixture as $f) {
-                $homeTeam = $teams->where("id", $f->home_team_id)->first();
-                $awayTeam = $teams->where("id", $f->away_team_id)->first();
-                $homeTeamGoal = 0;
-                $awayTeamGoal = 0;
-
-                for ($i = 0; $i < self::ITERATION_COUNT; $i++) {
-                    // Scoring probabilities for teams
-                    $homeTeamGoalProb = $homeTeam->strength / ($homeTeam->strength + $awayTeam->strength);
-                    $awayTeamGoalProb = $awayTeam->strength / ($awayTeam->strength + $homeTeam->strength);
-
-                    // probability of goals per minute
-                    $goalPerMinute = min(self::GOAL_PER_MIN_VAL, self::GOAL_PER_MAX_VAL / self::MATCH_LENGTH);
-
-                    // Check if there are goals for every minute of the match
-                    for ($minute = 1; $minute <= self::MATCH_LENGTH; $minute++) {
-                        if (rand(0, 100000) / self::MATCH_LENGTH < $goalPerMinute * $homeTeamGoalProb) {
-                            $homeTeamGoal++;
-                        }
-                        if (rand(0, 100000) / self::MATCH_LENGTH < $goalPerMinute * $awayTeamGoalProb) {
-                            $awayTeamGoal++;
-                        }
-                    }
-                }
-
-                // @todo: can be improved, come back later
-                $homeTeam->update([
-                    "points" => $homeTeamGoal > $awayTeamGoal ? $homeTeam->points + 3 : ($homeTeamGoal == $awayTeamGoal ? $homeTeam->points + 1 : $homeTeam->points),
-                    "win" => $homeTeamGoal > $awayTeamGoal ? $homeTeam->win + 1 : $homeTeam->win,
-                    "drawn" => $homeTeamGoal == $awayTeamGoal ? $homeTeam->drawn + 1 : $homeTeam->drawn,
-                    "lost" => $homeTeamGoal < $awayTeamGoal ? $homeTeam->lost + 1 : $homeTeam->lost,
-                    "goal_for" => $homeTeam->goal_for + $homeTeamGoal,
-                    "goal_against" => $homeTeam->goal_against + $awayTeamGoal,
-                    "goal_dif" => ($homeTeam->goal_for + $homeTeamGoal) - ($homeTeam->goal_against + $awayTeamGoal),
-                    "played" => $homeTeam->played + 1,
-                ]);
-
-                $awayTeam->update([
-                    "points" => $awayTeamGoal > $homeTeamGoal ? $awayTeam->points + 3 : ($awayTeamGoal == $homeTeamGoal ? $awayTeam->points + 1 : $awayTeam->points),
-                    "win" => $awayTeamGoal > $homeTeamGoal ? $awayTeam->win + 1 : $awayTeam->win,
-                    "drawn" => $awayTeamGoal == $homeTeamGoal ? $awayTeam->drawn + 1 : $awayTeam->drawn,
-                    "lost" => $awayTeamGoal < $homeTeamGoal ? $awayTeam->lost + 1 : $awayTeam->lost,
-                    "goal_for" => $awayTeam->goal_for + $awayTeamGoal,
-                    "goal_against" => $awayTeam->goal_against + $homeTeamGoal,
-                    "goal_dif" => ($awayTeam->goal_for + $awayTeamGoal) - ($awayTeam->goal_against + $homeTeamGoal),
-                    "played" => $awayTeam->played + 1,
-                ]);
-                $results[] = [
-                    "home_team" => $homeTeam->name,
-                    "home_team_goal" => $homeTeamGoal,
-                    "away_team" => $awayTeam->name,
-                    "away_team_goal" => $awayTeamGoal,
-                ];
-
+                $results[] = self::playMatch($f);
             }
             Fixture::where("week", $request->week)->update(["is_played" => true]);
-            return $results;
         }
+        return $results;
     }
 
     /**
-     * @param $team
-     * @param $leaderTeamsPoint
-     * @param $fixtures
-     * @return int|float
+     * @param $fixture
+     * @return array
      */
-    public function calculateTeamChance($team, $leaderTeamsPoint, $fixtures): int|float
+    private function playMatch($fixture): array
     {
-        $chance = 0;
+        $homeTeam = $fixture->homeTeam[0];
+        $awayTeam = $fixture->awayTeam[0];
+        $homeTeamGoal = 0;
+        $awayTeamGoal = 0;
 
-        // Can become the champion if wins all the remaining matches? if not, no chance => 0
-        if (($this->remainedPoints + $team->points) < $leaderTeamsPoint) {
-            return $chance;
-        }
-
-        foreach ($fixtures as $fixture) {
-//            $awayTeam = Team::where("id", $fixture->away_team_id)->first();
-            if ($fixture->home_team_id == $team->id) {
-                $chance += 2;
-//                $chance += $team->strength / ($team->strength + $awayTeam->strength);;
-//                $chance += $team->points;
-            }
-            $chance += 1;
-//            $chance += $awayTeam->strength / ($awayTeam->strength + $team->strength);;
-//            $chance += $this->remainedPoints - $team->points;
-        }
-
-        // 2* 80 - ((10-6) / 2)
-
-        /*
-         *  $homeTeamGoalProb = $homeTeam->strength / ($homeTeam->strength + $awayTeam->strength);
+        for ($i = 0; $i < self::ITERATION_COUNT; $i++) {
+            // Scoring probabilities for teams
+            $homeTeamGoalProb = $homeTeam->strength / ($homeTeam->strength + $awayTeam->strength);
             $awayTeamGoalProb = $awayTeam->strength / ($awayTeam->strength + $homeTeam->strength);
-         */
 
-        // @todo: will be checked again
-        $chance = $chance * $team->strength - (($leaderTeamsPoint - $team->points) / 2);
+            // probability of goals per minute
+            $goalPerMinute = min(self::GOAL_PER_MIN_VAL, self::GOAL_PER_MAX_VAL / self::MATCH_LENGTH);
 
-        if ($chance > 0) {
-            return $chance;
+            // Check if there are goals for every minute of the match
+            for ($minute = 1; $minute <= self::MATCH_LENGTH; $minute++) {
+                if (rand(0, 100000) / self::MATCH_LENGTH < $goalPerMinute * $homeTeamGoalProb) {
+                    $homeTeamGoal++;
+                }
+                if (rand(0, 100000) / self::MATCH_LENGTH < $goalPerMinute * $awayTeamGoalProb) {
+                    $awayTeamGoal++;
+                }
+            }
         }
-        return 0;
+
+        // @todo: can be improved, come back later
+        $homeTeam->update([
+            "points" => $homeTeamGoal > $awayTeamGoal ? $homeTeam->points + 3 : ($homeTeamGoal == $awayTeamGoal ? $homeTeam->points + 1 : $homeTeam->points),
+            "win" => $homeTeamGoal > $awayTeamGoal ? $homeTeam->win + 1 : $homeTeam->win,
+            "drawn" => $homeTeamGoal == $awayTeamGoal ? $homeTeam->drawn + 1 : $homeTeam->drawn,
+            "lost" => $homeTeamGoal < $awayTeamGoal ? $homeTeam->lost + 1 : $homeTeam->lost,
+            "goal_for" => $homeTeam->goal_for + $homeTeamGoal,
+            "goal_against" => $homeTeam->goal_against + $awayTeamGoal,
+            "goal_dif" => ($homeTeam->goal_for + $homeTeamGoal) - ($homeTeam->goal_against + $awayTeamGoal),
+            "played" => $homeTeam->played + 1,
+        ]);
+
+        $awayTeam->update([
+            "points" => $awayTeamGoal > $homeTeamGoal ? $awayTeam->points + 3 : ($awayTeamGoal == $homeTeamGoal ? $awayTeam->points + 1 : $awayTeam->points),
+            "win" => $awayTeamGoal > $homeTeamGoal ? $awayTeam->win + 1 : $awayTeam->win,
+            "drawn" => $awayTeamGoal == $homeTeamGoal ? $awayTeam->drawn + 1 : $awayTeam->drawn,
+            "lost" => $awayTeamGoal < $homeTeamGoal ? $awayTeam->lost + 1 : $awayTeam->lost,
+            "goal_for" => $awayTeam->goal_for + $awayTeamGoal,
+            "goal_against" => $awayTeam->goal_against + $homeTeamGoal,
+            "goal_dif" => ($awayTeam->goal_for + $awayTeamGoal) - ($awayTeam->goal_against + $homeTeamGoal),
+            "played" => $awayTeam->played + 1,
+        ]);
+
+        return [
+            "home_team" => $homeTeam->name,
+            "home_team_goal" => $homeTeamGoal,
+            "away_team" => $awayTeam->name,
+            "away_team_goal" => $awayTeamGoal,
+        ];
     }
 
     /**
@@ -199,5 +162,32 @@ class SimulationController extends Controller
         }
         $teams = $teams->sortByDesc("chance");
         return DataTables::of($teams)->toJson();
+    }
+
+    /**
+     * @param $team
+     * @param $leaderTeamsPoint
+     * @param $fixtures
+     * @return int|float
+     */
+    private function calculateTeamChance($team, $leaderTeamsPoint, $fixtures): int|float
+    {
+        $chance = 0;
+
+        // Can become the champion if wins all the remaining matches? if not, no chance => 0
+        if (($this->remainedPoints + $team->points) >= $leaderTeamsPoint) {
+            foreach ($fixtures as $fixture) {
+                $awayTeam = Team::where("id", $fixture->away_team_id)->first();
+                if ($fixture->home_team_id == $team->id) {
+                    $chance += $team->strength / ($team->strength + $awayTeam->strength);
+                } else {
+                    $chance += $awayTeam->strength / ($awayTeam->strength + $team->strength);;
+                }
+            }
+
+            $chance = $chance * $team->strength - (($leaderTeamsPoint - $team->points) / 2);
+        }
+
+        return max($chance, 0);
     }
 }

@@ -196,11 +196,6 @@
             let currentWeek = {{$currentWeek}};
             let fixtureEnds = {{$fixtureEnds}};
 
-            if (currentWeek === fixtureEnds) {
-                $('#playAll').hide();
-                $('#playNext').hide();
-            }
-
             $('#standings').DataTable({
                 "searching": false,
                 "lengthChange": false,
@@ -318,7 +313,7 @@
                         } else {
                             $.dialog({
                                 title: 'Info!',
-                                content: "fixture completed, no new match can be played",
+                                content: "Fixture completed",
                             });
                             $('#playNext').prop('disabled', true)
                             $('#playAll').prop('disabled', true)
